@@ -11,13 +11,17 @@ import { DisposableStore } from '../../../../util/vs/base/common/lifecycle';
 
 const mockGetAccounts = vi.hoisted(() => vi.fn());
 const mockGetSession = vi.hoisted(() => vi.fn());
-const mockOnDidChangeSessionsEmitter = vi.hoisted(() => new Emitter<{ provider: { id: string } }>());
+
+// Create emitter for managing session change events in tests
+let mockOnDidChangeSessionsEmitter: Emitter<{ provider: { id: string } }>;
 
 vi.mock('vscode', () => ({
 	authentication: {
 		getAccounts: mockGetAccounts,
 		getSession: mockGetSession,
-		onDidChangeSessions: mockOnDidChangeSessionsEmitter.event,
+		get onDidChangeSessions() {
+			return mockOnDidChangeSessionsEmitter.event;
+		},
 	},
 }));
 
@@ -54,6 +58,7 @@ describe('CopilotAccountManager', () => {
 	let disposables: DisposableStore;
 
 	beforeEach(() => {
+		mockOnDidChangeSessionsEmitter = new Emitter<{ provider: { id: string } }>();
 		disposables = new DisposableStore();
 		mockGetAccounts.mockReset();
 		mockGetSession.mockReset();

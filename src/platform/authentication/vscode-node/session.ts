@@ -121,7 +121,7 @@ export function getSessionForAccount(
 	account: AuthenticationSessionAccountInformation,
 	scopes: string[],
 	options: AuthenticationGetSessionOptions = {},
-): Promise<AuthenticationSession | undefined> {
+): Thenable<AuthenticationSession | undefined> {
 	return authentication.getSession(providerId, scopes, {
 		...options,
 		account,

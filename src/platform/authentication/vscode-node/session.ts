@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { authentication, AuthenticationGetSessionOptions, AuthenticationSession, AuthenticationSessionsChangeEvent } from 'vscode';
+import { authentication, AuthenticationGetSessionOptions, AuthenticationSession, AuthenticationSessionAccountInformation, AuthenticationSessionsChangeEvent } from 'vscode';
 import { mixin } from '../../../util/vs/base/common/objects';
 import { URI } from '../../../util/vs/base/common/uri';
 import { AuthPermissionMode, ConfigKey, IConfigurationService } from '../../configuration/common/configurationService';
@@ -110,6 +110,23 @@ export function getAlignedSession(configurationService: IConfigurationService, o
 		async () => await authentication.getSession(providerId, GITHUB_SCOPE_ALIGNED, { silent: true }),
 		options
 	);
+}
+
+/**
+ * Récupère la session d'un compte précis SANS clearSessionPreference (non destructeur).
+ * @internal — préférer ICopilotAccountManager.
+ */
+export function getSessionForAccount(
+	providerId: string,
+	account: AuthenticationSessionAccountInformation,
+	scopes: string[],
+	options: AuthenticationGetSessionOptions = {},
+): Promise<AuthenticationSession | undefined> {
+	return authentication.getSession(providerId, scopes, {
+		...options,
+		account,
+		// NE PAS mettre clearSessionPreference ici.
+	});
 }
 
 export function authChangeAffectsCopilot(event: AuthenticationSessionsChangeEvent, configurationService: IConfigurationService): boolean {

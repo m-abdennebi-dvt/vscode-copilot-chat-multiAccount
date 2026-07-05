@@ -10,6 +10,7 @@ import { AuthProviderId } from '../../configuration/common/configurationService'
 import { IVSCodeExtensionContext } from '../../extContext/common/extensionContext';
 import { ILogService } from '../../log/common/logService';
 import { CopilotAccount, ICopilotAccountManager } from '../common/copilotAccountManager';
+import { CopilotToken } from '../common/copilotToken';
 import { GITHUB_SCOPE_USER_EMAIL } from '../common/authentication';
 import { getSessionForAccount } from './session';
 
@@ -31,6 +32,7 @@ export class CopilotAccountManager extends Disposable implements ICopilotAccount
 
 	private _accounts: CopilotAccount[] = [];
 	private _activeAccount: CopilotAccount | undefined;
+	private _tokenCache: Map<string, { token: CopilotToken; mintedAt: number }> = new Map();
 
 	get accounts(): readonly CopilotAccount[] {
 		return this._accounts;
@@ -128,6 +130,31 @@ export class CopilotAccountManager extends Disposable implements ICopilotAccount
 		}
 		const scopes = GITHUB_SCOPE_USER_EMAIL;
 		return getSessionForAccount(account.providerId, { id: account.id, label: account.label }, scopes, { silent: true });
+	}
+
+	getCachedToken(accountId: string): CopilotToken | undefined {
+		const cached = this._tokenCache.get(accountId);
+		if (cached && !this._isExpiring(cached.token)) {
+			this._log.debug(`[CopilotAccountManager] Cache hit for ${accountId}`);
+			return cached.token;
+		}
+		if (cached) {
+			this._tokenCache.delete(accountId);
+		}
+		return undefined;
+	}
+
+	cacheToken(accountId: string, token: CopilotToken): void {
+		this._log.debug(`[CopilotAccountManager] Caching token for ${accountId}`);
+		this._tokenCache.set(accountId, { token, mintedAt: Date.now() });
+	}
+
+	private _isExpiring(token: CopilotToken): boolean {
+		// 5 minutes margin before actual expiration
+		const expiresAt = token.expiresAt * 1000; // Convert to milliseconds
+		const now = Date.now();
+		const fiveMinutesMs = 5 * 60 * 1000;
+		return expiresAt - now < fiveMinutesMs;
 	}
 
 	private _persistActiveAccountId(id: string | undefined): Thenable<void> {

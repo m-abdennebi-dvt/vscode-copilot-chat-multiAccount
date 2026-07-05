@@ -183,6 +183,10 @@ export class CopilotToken {
 		return this._info.username;
 	}
 
+	get expiresAt(): number {
+		return this._info.expires_at;
+	}
+
 	private _isTelemetryEnabled: boolean | undefined;
 	isTelemetryEnabled(): boolean {
 		if (this._isTelemetryEnabled === undefined) {

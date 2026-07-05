@@ -281,6 +281,13 @@ export abstract class BaseAuthenticationService extends Disposable implements IA
 	//#endregion
 
 	protected async _handleAuthChangeEvent(): Promise<void> {
+		// Skip if account switch in progress (avoid interference)
+		// Note: This check will be enabled once AccountSwitchCoordinator is registered
+		if ((this as any)._accountSwitchCoordinator?.isSwitchInProgress?.()) {
+			this._logService.debug('[BaseAuthenticationService] Skipping _handleAuthChangeEvent during account switch');
+			return;
+		}
+
 		const anyGitHubSessionBefore = this._anyGitHubSession;
 		const permissiveGitHubSessionBefore = this._permissiveGitHubSession;
 		const anyAdoSessionBefore = this._anyAdoSession;

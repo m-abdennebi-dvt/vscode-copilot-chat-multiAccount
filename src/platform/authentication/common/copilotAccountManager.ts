@@ -49,4 +49,10 @@ export interface ICopilotAccountManager {
 	 * NE MINT PAS de token Copilot — c'est le rôle du token manager (étape 3).
 	 */
 	getSessionForActiveAccount(): Promise<AuthenticationSession | undefined>;
+
+	/** Récupère le token en cache pour un compte, undefined si expirant ou absent. */
+	getCachedToken(accountId: string): any | undefined;
+
+	/** Stocke un token en cache pour un compte (5 min d'expiration margin). */
+	cacheToken(accountId: string, token: any): void;
 }

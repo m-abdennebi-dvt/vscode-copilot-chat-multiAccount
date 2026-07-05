@@ -323,6 +323,23 @@ async function moveSourceMapsToSeparateDir(): Promise<void> {
 	}
 }
 
+/**
+ * Copies WASM bindings from node_modules to dist directory.
+ * Required for @github/blackbird-external-ingest-utils to work.
+ */
+async function copyWasmBindings(): Promise<void> {
+	const wasmSource = path.join(REPO_ROOT, 'node_modules/@github/blackbird-external-ingest-utils/pkg/nodejs/external_ingest_utils_bg.wasm');
+	const wasmDest = path.join(REPO_ROOT, 'dist/external_ingest_utils_bg.wasm');
+
+	try {
+		await mkdir(path.dirname(wasmDest), { recursive: true });
+		await copyFile(wasmSource, wasmDest);
+		console.log('✓ WASM bindings copied to dist/');
+	} catch (error) {
+		console.warn('Could not copy WASM bindings:', error);
+	}
+}
+
 async function main() {
 	if (!isDev) {
 		applyPackageJsonPatch(isPreRelease);
@@ -369,6 +386,7 @@ async function main() {
 						console.error('[watch]', error);
 					}
 				}
+				await copyWasmBindings();
 				console.log('[watch] build finished');
 			}, 100);
 		};
@@ -408,6 +426,9 @@ async function main() {
 			esbuild.build(typeScriptServerPluginBuildOptions),
 			esbuild.build(webviewBuildOptions),
 		]);
+
+		// Copy WASM bindings required by external ingest utils
+		await copyWasmBindings();
 
 		// Move source maps to separate directory so they're not packaged with the extension
 		await moveSourceMapsToSeparateDir();

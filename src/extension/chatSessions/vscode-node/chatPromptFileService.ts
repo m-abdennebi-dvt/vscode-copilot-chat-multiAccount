@@ -36,17 +36,23 @@ export class ChatPromptFileService extends Disposable implements IChatPromptFile
 	) {
 		super();
 
-		this._register(vscode.chat.onDidChangeCustomAgents(() => {
-			this.triggerRefreshCustomAgents();
-		}));
+		if (vscode.chat.onDidChangeCustomAgents) {
+			this._register(vscode.chat.onDidChangeCustomAgents(() => {
+				this.triggerRefreshCustomAgents();
+			}));
+		}
 
-		this._register(vscode.chat.onDidChangeInstructions(() => {
-			this._onDidChangeInstructions.fire();
-		}));
+		if (vscode.chat.onDidChangeInstructions) {
+			this._register(vscode.chat.onDidChangeInstructions(() => {
+				this._onDidChangeInstructions.fire();
+			}));
+		}
 
-		this._register(vscode.chat.onDidChangeSkills(() => {
-			this._onDidChangeSkills.fire();
-		}));
+		if (vscode.chat.onDidChangeSkills) {
+			this._register(vscode.chat.onDidChangeSkills(() => {
+				this._onDidChangeSkills.fire();
+			}));
+		}
 
 		if (vscode.chat.onDidChangeHooks) {
 			this._register(vscode.chat.onDidChangeHooks(() => {
@@ -67,15 +73,15 @@ export class ChatPromptFileService extends Disposable implements IChatPromptFile
 	}
 
 	get customAgents(): readonly vscode.ChatResource[] {
-		return vscode.chat.customAgents;
+		return vscode.chat.customAgents ?? [];
 	}
 
 	get instructions(): readonly vscode.ChatResource[] {
-		return vscode.chat.instructions;
+		return vscode.chat.instructions ?? [];
 	}
 
 	get skills(): readonly vscode.ChatResource[] {
-		return vscode.chat.skills;
+		return vscode.chat.skills ?? [];
 	}
 
 	get hooks(): readonly vscode.ChatResource[] {
@@ -106,7 +112,8 @@ export class ChatPromptFileService extends Disposable implements IChatPromptFile
 	}
 
 	private async refreshCustomAgents(token: CancellationToken): Promise<void> {
-		const parsedAgents = coalesce(await Promise.all(vscode.chat.customAgents.map(async resource => {
+		const customAgents = vscode.chat.customAgents ?? [];
+		const parsedAgents = coalesce(await Promise.all(customAgents.map(async resource => {
 			try {
 				return await this.promptsService.parseFile(resource.uri, token);
 			} catch (error) {

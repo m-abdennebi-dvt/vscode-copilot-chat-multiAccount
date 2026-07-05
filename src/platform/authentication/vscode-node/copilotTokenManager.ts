@@ -64,6 +64,18 @@ export class VSCodeCopilotTokenManager extends BaseCopilotTokenManager {
 		return new CopilotToken(this.copilotToken);
 	}
 
+	async mintForSession(session: any): Promise<CopilotToken> {
+		try {
+			this._logService.debug(`Minting token for session: ${session.account.label}`);
+			const tokenInfo = await this._authShowWarnings();
+			this._logService.debug(`Successfully minted token for ${session.account.label}`);
+			return new CopilotToken(tokenInfo);
+		} catch (e) {
+			this._logService.debug(`Failed to mint token for ${session.account.label}: ${e}`);
+			throw e;
+		}
+	}
+
 	private async _auth(): Promise<TokenInfoOrError> {
 		const failWith = this.configurationService.getConfig(ConfigKey.Advanced.DebugGitHubAuthFailWith);
 		if (failWith) {

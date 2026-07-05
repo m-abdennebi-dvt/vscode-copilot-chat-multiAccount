@@ -7,10 +7,12 @@ import * as os from 'os';
 import * as path from 'path';
 import { ExtensionContext, ExtensionMode, env, workspace } from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
+import { ICopilotAccountManager } from '../../../platform/authentication/common/copilotAccountManager';
 import { ICopilotTokenManager } from '../../../platform/authentication/common/copilotTokenManager';
 import { StaticGitHubAuthenticationService } from '../../../platform/authentication/common/staticGitHubAuthenticationService';
 import { createStaticGitHubTokenProvider, getOrCreateTestingCopilotTokenManager } from '../../../platform/authentication/node/copilotTokenManager';
 import { AuthenticationService } from '../../../platform/authentication/vscode-node/authenticationService';
+import { CopilotAccountManager } from '../../../platform/authentication/vscode-node/copilotAccountManagerImpl';
 import { VSCodeCopilotTokenManager } from '../../../platform/authentication/vscode-node/copilotTokenManager';
 import { IChatAgentService } from '../../../platform/chat/common/chatAgents';
 import { IChatDebugFileLoggerService } from '../../../platform/chat/common/chatDebugFileLoggerService';
@@ -203,6 +205,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 		builder.define(IEndpointProvider, new SyncDescriptor(ProductionEndpointProvider));
 		builder.define(IIgnoreService, new SyncDescriptor(VsCodeIgnoreService));
 	}
+
+	builder.define(ICopilotAccountManager, new SyncDescriptor(CopilotAccountManager));
 
 	builder.define(ITestGenInfoStorage, new SyncDescriptor(TestGenInfoStorage)); // Used for test generation (/tests intent)
 	builder.define(IParserService, new SyncDescriptor(ParserServiceImpl, [/*useWorker*/ true]));

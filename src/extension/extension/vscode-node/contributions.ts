@@ -52,6 +52,7 @@ import { InlineCompletionContribution } from '../../typescriptContext/vscode-nod
 import { NesRenameContribution } from '../../typescriptContext/vscode-node/nesRenameService';
 import * as workspaceIndexingContribution from '../../workspaceChunkSearch/vscode-node/workspaceChunkSearch.contribution';
 import { WorkspaceRecorderFeature } from '../../workspaceRecorder/vscode-node/workspaceRecorderFeature';
+import { MultiAccountDebugContribution } from '../../multiAccount/vscode-node/multiAccountDebugContribution';
 import vscodeContributions from '../vscode/contributions';
 
 // ###################################################################################################
@@ -67,6 +68,7 @@ export const vscodeNodeContributions: IExtensionContributionFactory[] = [
 	asContributionFactory(ExtensionStateCommandContribution),
 	asContributionFactory(ConversationFeature),
 	asContributionFactory(AuthenticationContrib),
+	asContributionFactory(MultiAccountDebugContribution),
 	chatBlockLanguageContribution,
 	asContributionFactory(LoggingActionsContrib),
 	asContributionFactory(FetcherTelemetryContribution),

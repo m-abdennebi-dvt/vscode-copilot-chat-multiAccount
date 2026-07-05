@@ -141,5 +141,19 @@
 		".github/skills/.local": true,
 		".agents/skills/.local": true,
 		".claude/skills/.local": true,
+	},
+	"workbench.colorCustomizations": {
+		"activityBar.foreground": "#FFAA94",
+		"activityBar.background": "#030100",
+		"activityBar.inactiveForeground": "#8F2036",
+		"activityBarBadge.foreground": "#000000",
+		"activityBarBadge.background": "#BBB130",
+		"statusBar.foreground": "#FDDD8B",
+		"statusBar.background": "#7B5A08",
+		"statusBarItem.hoverBackground": "#464E0B",
+		"statusBarItem.remoteForeground": "#C3FC86",
+		"statusBarItem.remoteBackground": "#417903",
+		"statusBar.debuggingForeground": "#000000",
+		"statusBar.debuggingBackground": "#B1913F"
 	}
 }
